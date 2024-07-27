@@ -1,0 +1,78 @@
+#!/bin/bash
+
+# Cyberpunk-style header
+echo "====================================="
+ ____            _   ____       _            _   _           
+|  _ \ ___  _ __| |_|  _ \  ___| |_ ___  ___| |_(_)_   _____ 
+| |_) / _ \| '__| __| | | |/ _ \ __/ _ \/ __| __| \ \ / / _ \
+|  __/ (_) | |  | |_| |_| |  __/ ||  __/ (__| |_| |\ V /  __/
+|_|   \___/|_|   \__|____/ \___|\__\___|\___|\__|_| \_/ \___|
+echo "====================================="
+echo "        Welcome to PortDetective      "
+echo "====================================="
+echo "  _______  _______  _______  _______  "
+"
+echo "====================================="
+
+# Prompt user for IP address and port
+read -p "Enter the IP address to troubleshoot: " IP_ADDRESS
+read -p "Enter the port to troubleshoot: " PORT
+
+# Function to check if the port is open on the local machine
+check_local_port() {
+    echo "Checking if port $PORT is open on the local machine..."
+    if nc -zv 127.0.0.1 $PORT; then
+        echo "Port $PORT is open on the local machine."
+    else
+        echo "Port $PORT is not open on the local machine. Check the service running on this port."
+    fi
+}
+
+# Function to check if the port is open on the internal IP address
+check_internal_port() {
+    echo "Checking if port $PORT is open on the internal IP address $IP_ADDRESS..."
+    if nc -zv $IP_ADDRESS $PORT; then
+        echo "Port $PORT is open on the internal IP address."
+    else
+        echo "Port $PORT is not open on the internal IP address. Check the firewall and service configuration."
+    fi
+}
+
+# Function to check if the port is open from an external source
+check_external_port() {
+    echo "Checking if port $PORT is open from an external source..."
+    if nc -zv $(curl -s ifconfig.me) $PORT; then
+        echo "Port $PORT is open from an external source."
+    else
+        echo "Port $PORT is not open from an external source. Check the router's port forwarding settings."
+    fi
+}
+
+# Function to check firewall rules
+check_firewall() {
+    echo "Checking firewall rules for port $PORT..."
+    if iptables -L -n | grep $PORT; then
+        echo "Firewall rules are allowing traffic on port $PORT."
+    else
+        echo "Firewall rules are blocking traffic on port $PORT. Update the firewall rules."
+    fi
+}
+
+# Run checks
+check_local_port
+check_internal_port
+check_external_port
+check_firewall
+
+echo "====================================="
+echo "       PortDetective Complete         "
+echo "====================================="
+echo "  _______  _______  _______  _______  "
+echo " (  ____ \(  ___  )(  ____ \(  ____ \ "
+echo " | (    \/| (   ) || (    \/| (    \/ "
+echo " | |      | |   | || (__    | (_____  "
+echo " | |      | |   | ||  __)   (_____  ) "
+echo " | |      | |   | || (            ) | "
+echo " | (____/\| (___) || (____/\/\____) | "
+echo " (_______/(_______)(_______/\_______) "
+echo "====================================="
