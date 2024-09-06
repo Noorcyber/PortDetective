@@ -1,20 +1,13 @@
 #!/bin/bash
 
-# Cyberpunk-style header (replaced with echo statements)
-echo "====================================="
-echo " ____            _   ____       _            _   _           "
-echo "|  _ \ ___  _ __| |_|  _ \  ___| |_ ___  ___| |_(_)_   _____ "
-echo "| |_) / _ \| '__| __| | | |/ _ \ __/ _ \/ __| __| \ \ / / _ \\"
-echo "|  __/ (_) | |  | |_| |_| |  __/ ||  __/ (__| |_| |\ V /  __/"
-echo "|_|   \___/|_|   \__|____/ \___|\__\___|\___|\__|_| \_/ \___|"
-echo "====================================="
-echo "        Welcome to PortDetective      "
-echo "====================================="
-echo "  _______  _______  _______  _______  "
+echo "Starting script..."
 
 # Prompt user for IP address and port
+echo "Prompting for IP address and port..."
 read -p "Enter the IP address to troubleshoot: " IP_ADDRESS
 read -p "Enter the port to troubleshoot: " PORT
+
+echo "IP address and port input captured."
 
 # Function to check if the port is open on the local machine
 check_local_port() {
@@ -26,6 +19,8 @@ check_local_port() {
     fi
 }
 
+echo "Local port check function defined."
+
 # Function to check if the port is open on the internal IP address
 check_internal_port() {
     echo "Checking if port $PORT is open on the internal IP address $IP_ADDRESS..."
@@ -35,6 +30,8 @@ check_internal_port() {
         echo "Port $PORT is not open on the internal IP address. Check the firewall and service configuration."
     fi
 }
+
+echo "Internal port check function defined."
 
 # Function to check if the port is open from an external source
 check_external_port() {
@@ -47,6 +44,8 @@ check_external_port() {
     fi
 }
 
+echo "External port check function defined."
+
 # Function to check firewall rules
 check_firewall() {
     echo "Checking firewall rules for port $PORT..."
@@ -57,22 +56,19 @@ check_firewall() {
     fi
 }
 
+echo "Firewall check function defined."
+
 # Run checks
 check_local_port
-check_internal_port
-check_external_port
-check_firewall
+echo "Local port check completed."
 
-# Completion message (replaced with echo statements)
-echo "====================================="
-echo "       PortDetective Complete         "
-echo "====================================="
-echo "  _______  _______  _______  _______  "
-echo " (  ____ \(  ___  )(  ____ \(  ____ \ "
-echo " | (    \/| (   ) || (    \/| (    \/ "
-echo " | |      | |   | || (__    | (_____  "
-echo " | |      | |   | ||  __)   (_____  ) "
-echo " | |      | |   | || (            ) | "
-echo " | (____/\| (___) || (____/\/\____) | "
-echo " (_______/(_______)(_______/\_______) "
-echo "====================================="
+check_internal_port
+echo "Internal port check completed."
+
+check_external_port
+echo "External port check completed."
+
+check_firewall
+echo "Firewall check completed."
+
+echo "Script completed."
