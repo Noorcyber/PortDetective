@@ -1,74 +1,44 @@
 #!/bin/bash
 
-echo "Starting script..."
+# Simple Port Scanning Tool
 
-# Prompt user for IP address and port
-echo "Prompting for IP address and port..."
-read -p "Enter the IP address to troubleshoot: " IP_ADDRESS
-read -p "Enter the port to troubleshoot: " PORT
+# Function to display header
+display_header() {
+    echo "====================================="
+    echo "   Simple Port Scanning Tool         "
+    echo "====================================="
+}
 
-echo "IP address and port input captured."
-
-# Function to check if the port is open on the local machine
-check_local_port() {
-    echo "Checking if port $PORT is open on the local machine..."
-    if nc -zv 127.0.0.1 $PORT; then
-        echo "Port $PORT is open on the local machine."
+# Function to get IP address and port from arguments or prompt
+get_user_input() {
+    if [ -z "$1" ]; then
+        read -p "Enter the IP address to scan: " IP_ADDRESS
     else
-        echo "Port $PORT is not open on the local machine. Check the service running on this port."
+        IP_ADDRESS=$1
+    fi
+
+    if [ -z "$2" ]; then
+        read -p "Enter the port number to scan: " PORT
+    else
+        PORT=$2
     fi
 }
 
-echo "Local port check function defined."
-
-# Function to check if the port is open on the internal IP address
-check_internal_port() {
-    echo "Checking if port $PORT is open on the internal IP address $IP_ADDRESS..."
-    if nc -zv $IP_ADDRESS $PORT; then
-        echo "Port $PORT is open on the internal IP address."
+# Function to check if a port is open on a given IP address
+check_port() {
+    echo "Scanning port $PORT on IP address $IP_ADDRESS..."
+    if nc -zv $IP_ADDRESS $PORT 2>&1 | grep -q succeeded; then
+        echo "Success: Port $PORT is open on $IP_ADDRESS."
     else
-        echo "Port $PORT is not open on the internal IP address. Check the firewall and service configuration."
+        echo "Failure: Port $PORT is closed or unreachable on $IP_ADDRESS."
     fi
 }
 
-echo "Internal port check function defined."
+# Main script execution
+display_header
+get_user_input "$1" "$2"
+check_port
 
-# Function to check if the port is open from an external source
-check_external_port() {
-    echo "Checking if port $PORT is open from an external source..."
-    EXTERNAL_IP=$(curl -s ifconfig.me)
-    if nc -zv $EXTERNAL_IP $PORT; then
-        echo "Port $PORT is open from an external source."
-    else
-        echo "Port $PORT is not open from an external source. Check the router's port forwarding settings."
-    fi
-}
-
-echo "External port check function defined."
-
-# Function to check firewall rules
-check_firewall() {
-    echo "Checking firewall rules for port $PORT..."
-    if iptables -L -n | grep $PORT; then
-        echo "Firewall rules are allowing traffic on port $PORT."
-    else
-        echo "Firewall rules are blocking traffic on port $PORT. Update the firewall rules."
-    fi
-}
-
-echo "Firewall check function defined."
-
-# Run checks
-check_local_port
-echo "Local port check completed."
-
-check_internal_port
-echo "Internal port check completed."
-
-check_external_port
-echo "External port check completed."
-
-check_firewall
-echo "Firewall check completed."
-
-echo "Script completed."
+echo "====================================="
+echo "         Scanning Complete           "
+echo "====================================="
