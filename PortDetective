@@ -24,19 +24,49 @@ get_user_input() {
     fi
 }
 
+# Function to validate IP address format
+validate_ip() {
+    local ip="$1"
+    if [[ ! "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+        echo "Invalid IP address format."
+        exit 1
+    fi
+}
+
+# Function to validate port number
+validate_port() {
+    local port="$1"
+    if ! [[ "$port" =~ ^[0-9]+$ ]] || [ "$port" -lt 1 ] || [ "$port" -gt 65535 ]; then
+        echo "Invalid port number. Please enter a number between 1 and 65535."
+        exit 1
+    fi
+}
+
 # Function to check if a port is open on a given IP address
 check_port() {
     echo "Scanning port $PORT on IP address $IP_ADDRESS..."
-    if nc -zv $IP_ADDRESS $PORT 2>&1 | grep -q succeeded; then
-        echo "Success: Port $PORT is open on $IP_ADDRESS."
+    
+    # Use OpenWRT's default `nc` or `telnet`
+    # Try using `nc` first (if available), otherwise fall back to `telnet`
+    if command -v nc &> /dev/null; then
+        nc -zv -w 2 $IP_ADDRESS $PORT 2>&1 | grep -q succeeded && echo "Success: Port $PORT is open on $IP_ADDRESS." || echo "Failure: Port $PORT is closed or unreachable on $IP_ADDRESS."
+    elif command -v telnet &> /dev/null; then
+        (echo > /dev/tcp/$IP_ADDRESS/$PORT) &> /dev/null && echo "Success: Port $PORT is open on $IP_ADDRESS." || echo "Failure: Port $PORT is closed or unreachable on $IP_ADDRESS."
     else
-        echo "Failure: Port $PORT is closed or unreachable on $IP_ADDRESS."
+        echo "Error: Neither nc nor telnet are installed. Please install one of these utilities."
+        exit 1
     fi
 }
 
 # Main script execution
 display_header
 get_user_input "$1" "$2"
+
+# Validate IP and Port inputs
+validate_ip "$IP_ADDRESS"
+validate_port "$PORT"
+
+# Check the port
 check_port
 
 echo "====================================="
